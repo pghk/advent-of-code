@@ -23,3 +23,8 @@ test('example 2', function () {
     $input = explode("\n", SAMPLE);
     expect(Day02::partTwo($input))->toBe(12);
 });
+
+test('puzzle 2', function () {
+    $input = file(dirname(__DIR__) . '/data/2.txt', FILE_IGNORE_NEW_LINES);
+    expect(Day02::partTwo($input))->toBe(10398);
+});

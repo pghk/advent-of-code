@@ -5,18 +5,20 @@ namespace App\TwentyTwo;
 class Day04
 {
 
-    public static function conditionOne($a, $b): bool
+    /**
+     * One of ranges p1-p2, p3-p4 is a subset of the other
+     */
+    public static function conditionOne($p1, $p2, $p3, $p4): bool
     {
-        return ($a[0] <= $b[0] && $a[1] >= $b[1]) ||
-            ($a[0] >= $b[0] && $a[1] <= $b[1]);
+        return ($p1 <= $p3 && $p2 >= $p4) || ($p1 >= $p3 && $p2 <= $p4);
     }
 
-    public static function conditionTwo($a, $b): bool
+    /**
+     * One of ranges p1-p2, p3-p4 overlaps with the other
+     */
+    public static function conditionTwo($p1, $p2, $p3, $p4): bool
     {
-        return ($a[0] >= $b[0] && $a[0] <= $b[1]) ||
-            ($a[1] >= $b[0] && $a[1] <= $b[1]) ||
-            ($b[0] >= $a[0] && $b[0] <= $a[1]) ||
-            ($b[1] >= $a[0] && $b[1] <= $a[1]);
+        return !($p2 < $p3) && !($p1 > $p4);
     }
 
     public static function partOne($input): int
@@ -35,8 +37,8 @@ class Day04
         $count = 0;
 
         foreach ($pairs as $p) {
-            [$a, $b] = self::splitPair($p);
-            if ($check($a, $b)) {
+            [$p1, $p2, $p3, $p4] = self::flattenRangePair($p);
+            if ($check($p1, $p2, $p3, $p4)) {
                 $count++;
             }
         }
@@ -56,13 +58,12 @@ class Day04
     }
 
     /**
-     * @param array|false $i
+     * @param array $p
      * @return array
      */
-    public static function splitPair(array|false $i): array
+    public static function flattenRangePair(array $p): array
     {
-        return array_map(function ($i) {
-            return explode('-', $i);
-        }, $i);
+        [$r1, $r2] = array_map(fn($p) => explode('-', $p), $p);
+        return [...$r1, ...$r2];
     }
 }

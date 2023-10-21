@@ -21,12 +21,12 @@ test('Part One: Puzzle', function () {
     expect(Day04::partOne($input))->toBe(515);
 });
 
-// test('Part Two: Example', function () {
-//     $input = explode("\n", EXAMPLE_04);
-//     expect(Day04::partTwo($input))->toBe(0);
-// });
-//
-// test('Part Two: Puzzle', function () {
-//     $input = file(at('/04.txt'), FILE_IGNORE_NEW_LINES);
-//     expect(Day04::partTwo($input))->toBe(0);
-// });
+test('Part Two: Example', function () {
+    $input = explode("\n", EXAMPLE_04);
+    expect(Day04::partTwo($input))->toBe(4);
+});
+
+test('Part Two: Puzzle', function () {
+    $input = file(at('2022/04.txt'), FILE_IGNORE_NEW_LINES);
+    expect(Day04::partTwo($input))->toBe(883);
+});

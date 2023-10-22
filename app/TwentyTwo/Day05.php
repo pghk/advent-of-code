@@ -24,17 +24,15 @@ class Day05
             $i++;
         }
         $stacks = self::stackCrates($crates, $stacks, $map);
-        $moves = self::parseMoves($moves);
 
-        foreach ($moves as $k => $v)
-        {
-            [$quantity, $source, $destination] = $v;
-            foreach (range(1, $quantity) as $i) {
-                $stacks[$destination][] = array_pop($stacks[$source]);
+        foreach ($moves as $move) {
+            [$q, $from, $to] = self::parseMove($move);
+            for ($i = 0; $i < $q; $i++) {
+                $stacks[$to][] = array_pop($stacks[$from]);
             }
         }
 
-        return join(array_map(fn ($s) => array_pop($s), $stacks));
+        return join(array_map(fn($s) => array_pop($s), $stacks));
     }
 
     // public static function partTwo($input)
@@ -42,19 +40,17 @@ class Day05
     //
     // }
 
-    private static function parseMoves($moves): array
+    private static function parseMove($move): array
     {
-        return array_map(function ($m) {
-            $values = preg_replace('/\D+/', ' ', $m);
-            return explode(' ', trim($values));
-        }, $moves);
+        $values = preg_replace('/\D+/', ' ', $move);
+        return explode(' ', trim($values));
     }
 
     private static function getStacks($str): array
     {
         $stacks = [];
         $map = [];
-        foreach(str_split($str) as $i => $char) {
+        foreach (str_split($str) as $i => $char) {
             if ($char == ' ') {
                 continue;
             }

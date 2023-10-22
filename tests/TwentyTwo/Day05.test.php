@@ -24,12 +24,12 @@ test('Part One: Example', function () {
      expect(Day05::partOne($input))->toBe('WHTLRMZRC');
  });
 
-// test('Part Two: Example', function () {
-//     $input = explode("\n", EXAMPLE_05);
-//     expect(Day05::partTwo($input))->toBe(0);
-// });
-//
-// test('Part Two: Puzzle', function () {
-//     $input = file(at('TwentyTwo/05.txt'), FILE_IGNORE_NEW_LINES);
-//     expect(Day05::partTwo($input))->toBe(0);
-// });
+ test('Part Two: Example', function () {
+     $input = explode("\n", EXAMPLE_05);
+     expect(Day05::partTwo($input))->toBe('MCD');
+ });
+
+ test('Part Two: Puzzle', function () {
+     $input = file(at('2022/05.txt'), FILE_IGNORE_NEW_LINES);
+     expect(Day05::partTwo($input))->toBe('GMPMLWNMG');
+ });

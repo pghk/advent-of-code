@@ -35,10 +35,35 @@ class Day05
         return join(array_map(fn($s) => array_pop($s), $stacks));
     }
 
-    // public static function partTwo($input)
-    // {
-    //
-    // }
+     public static function partTwo($input)
+     {
+         $crates = [];
+         $stacks = [];
+         $map = [];
+         $moves = [];
+
+         $i = 0;
+         while ($i < count($input)) {
+             $str = $input[$i];
+             $type = self::getType($input[$i]);
+             match ($type) {
+                 'crate' => $crates[] = $str,
+                 'stack' => [$stacks, $map] = self::getStacks($str),
+                 'move' => $moves[] = $str,
+                 default => ''
+             };
+             $i++;
+         }
+         $stacks = self::stackCrates($crates, $stacks, $map);
+
+         foreach ($moves as $move) {
+             [$q, $from, $to] = self::parseMove($move);
+             array_push($stacks[$to], ...array_splice($stacks[$from], -$q));
+         }
+
+         return join(array_map(fn($s) => array_pop($s), $stacks));
+
+     }
 
     private static function parseMove($move): array
     {

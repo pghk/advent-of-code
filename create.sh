@@ -1,6 +1,8 @@
 #! /usr/bin/env sh
 
 FILE=app/${1}/Day${2}.php
+[[ -f $FILE ]] && echo "file already exists!" && exit 1
+
 cp example.php $FILE &&
 	sed -i '' "s/YEAR/$1/" $FILE &&
 	sed -i '' "s/DAY/$2/" $FILE

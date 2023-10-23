@@ -20,7 +20,7 @@ test('Part One: Example', function () {
 });
 
  test('Part One: Puzzle', function () {
-     $input = file(at('2022/05.txt'), FILE_IGNORE_NEW_LINES);
+     $input = file(at('TwentyTwo/05.txt'), FILE_IGNORE_NEW_LINES);
      expect(Day05::partOne($input))->toBe('WHTLRMZRC');
  });
 
@@ -30,6 +30,6 @@ test('Part One: Example', function () {
  });
 
  test('Part Two: Puzzle', function () {
-     $input = file(at('2022/05.txt'), FILE_IGNORE_NEW_LINES);
+     $input = file(at('TwentyTwo/05.txt'), FILE_IGNORE_NEW_LINES);
      expect(Day05::partTwo($input))->toBe('GMPMLWNMG');
  });

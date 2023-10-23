@@ -17,7 +17,7 @@ test('Part One: Example', function () {
 });
 
 test('Part One: Puzzle', function () {
-    $input = file(at('2022/04.txt'), FILE_IGNORE_NEW_LINES);
+    $input = file(at('TwentyTwo/04.txt'), FILE_IGNORE_NEW_LINES);
     expect(Day04::partOne($input))->toBe(515);
 });
 
@@ -27,6 +27,6 @@ test('Part Two: Example', function () {
 });
 
 test('Part Two: Puzzle', function () {
-    $input = file(at('2022/04.txt'), FILE_IGNORE_NEW_LINES);
+    $input = file(at('TwentyTwo/04.txt'), FILE_IGNORE_NEW_LINES);
     expect(Day04::partTwo($input))->toBe(883);
 });

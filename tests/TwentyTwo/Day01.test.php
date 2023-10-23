@@ -27,7 +27,7 @@ test('Part One: Example', function () {
 });
 
 test('Part One: Puzzle', function () {
-    $input = file_get_contents(at('/2022/01.txt'));
+    $input = file_get_contents(at('/TwentyTwo/01.txt'));
     expect(Day01::partOne($input))->toBe(71934);
 });
 
@@ -36,6 +36,6 @@ test('Part Two: Example', function () {
 });
 
 test('Part Two: Puzzle', function () {
-    $input = file_get_contents(at('/2022/01.txt'));
+    $input = file_get_contents(at('/TwentyTwo/01.txt'));
     expect(Day01::partTwo($input))->toBe(211447);
 });

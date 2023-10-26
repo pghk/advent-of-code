@@ -4,57 +4,77 @@ namespace App\TwentyTwo;
 
 class Day07
 {
-    private array $pos = [];
-    private array $sizes = [];
+    const SPACE_TOTAL = 70000000;
+    const SPACE_NEEDED = 30000000;
 
-    public function __construct(public array $input) {}
+    private array $diskUsage = [];
+
+    public function __construct(public array $input) {
+        $this->analyze($this->input);
+    }
 
     public function partOne(): int
     {
-        $this->analyze($this->input);
-        $selected = array_filter($this->sizes, fn($s) => $s <= 100000);
+        $selected = array_filter($this->diskUsage, fn($s) => $s <= 100000);
         return array_sum(array_values($selected));
     }
 
-    // public static function partTwo($input)
-    // {
-    //
-    // }
-
-    private function setPosition($path): void
-    {
-        switch ($path) {
-            case '/':
-                $this->pos = ['/'];
-                break;
-            case '..':
-                array_pop($this->pos);
-                break;
-            default:
-                $this->pos[] = $path;
-        }
-    }
+//     public static function partTwo($input)
+//     {
+//         return $
+//     }
 
     public function analyze($input): void
     {
-        array_walk($input, function ($v) {
-            if (str_starts_with($v, '$ cd ')) {
-                $dir = explode(' ', $v)[2];
-                $this::setPosition($dir);
+        $path = [];
+        array_walk($input, function ($i) use (&$path) {
+            if (str_starts_with($i, '$ cd ')) {
+                $this->trackLocation($i, $path);
                 return;
             }
-            $s = explode(' ', $v)[0];
-            if (!is_numeric($s)) {
-                return;
-            }
-            foreach ($this->pos as $i => $p) {
-                $path = $this->pos;
-                $k = join(':', array_slice($path, 0, $i + 1));
-                if (!array_key_exists($k, $this->sizes)) {
-                    $this->sizes[$k] = 0;
-                }
-                $this->sizes[$k] += (int)$s;
-            }
+            $this->setDiskUsage($i, $path);
         });
     }
+
+    private function trackLocation($cmd, array &$path): void
+    {
+        $dirname = explode(' ', $cmd)[2];
+        $this::setPosition($dirname, $path);
+    }
+
+    private function setPosition($dir, &$path): void
+    {
+        switch ($dir) {
+            case '/':
+                $path = ['/'];
+                break;
+            case '..':
+                array_pop($path);
+                break;
+            default:
+                $path[] = $dir;
+        }
+    }
+
+    function setDiskUsage($i, array $path): void
+    {
+        $size = explode(' ', $i)[0];
+        if (!is_numeric($size)) {
+            return;
+        }
+        $this->collectSizes($path, (int)$size);
+    }
+
+    function collectSizes(array $path, int $size): void
+    {
+        for ($n = 1; $n <= count($path); $n++) {
+            $k = join(':', array_slice($path, 0, $n));
+            if (!array_key_exists($k, $this->diskUsage)) {
+                $this->diskUsage[$k] = 0;
+            }
+            $this->diskUsage[$k] += $size;
+        }
+    }
+
+
 }

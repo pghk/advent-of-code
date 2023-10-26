@@ -30,14 +30,14 @@ const EXAMPLE_07 = <<<txt
 
 test('Part One: Example', function () {
     $input = explode("\n", EXAMPLE_07);
-    $test = new Day07();
-    expect($test->partOne($input))->toBe(95437);
+    $test = new Day07($input);
+    expect($test->partOne())->toBe(95437);
 });
 
  test('Part One: Puzzle', function () {
      $input = file(at('TwentyTwo/07.txt'), FILE_IGNORE_NEW_LINES);
-     $test = new Day07();
-     expect($test->partOne($input))->toBe(1086293);
+     $test = new Day07($input);
+     expect($test->partOne())->toBe(1086293);
  });
 
 // test('Part Two: Example', function () {

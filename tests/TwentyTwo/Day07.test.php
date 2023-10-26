@@ -40,12 +40,14 @@ test('Part One: Example', function () {
      expect($test->partOne())->toBe(1086293);
  });
 
-// test('Part Two: Example', function () {
-//     $input = explode("\n", EXAMPLE_07);
-//     expect(Day07::partTwo($input))->toBe(0);
-// });
-//
-// test('Part Two: Puzzle', function () {
-//     $input = file(at('TwentyTwo/07.txt'), FILE_IGNORE_NEW_LINES);
-//     expect(Day07::partTwo($input))->toBe(0);
-// });
+ test('Part Two: Example', function () {
+     $input = explode("\n", EXAMPLE_07);
+     $test = new Day07($input);
+     expect($test->partTwo())->toBe(24933642);
+ });
+
+ test('Part Two: Puzzle', function () {
+     $input = file(at('TwentyTwo/07.txt'), FILE_IGNORE_NEW_LINES);
+     $test = new Day07($input);
+     expect($test->partTwo())->toBe(366028);
+ });

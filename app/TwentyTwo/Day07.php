@@ -9,7 +9,8 @@ class Day07
 
     private array $diskUsage = [];
 
-    public function __construct(public array $input) {
+    public function __construct(public array $input)
+    {
         $this->analyze($this->input);
     }
 
@@ -19,12 +20,15 @@ class Day07
         return array_sum(array_values($selected));
     }
 
-//     public static function partTwo($input)
-//     {
-//         return $
-//     }
+    public function partTwo()
+    {
+        $size = self::SPACE_NEEDED - (self::SPACE_TOTAL - $this->diskUsage['/']);
+        $selected = array_filter($this->diskUsage, fn($s) => $s >= $size);
+        sort($selected);
+        return $selected[0];
+    }
 
-    public function analyze($input): void
+    private function analyze($input): void
     {
         $path = [];
         array_walk($input, function ($i) use (&$path) {
@@ -44,16 +48,11 @@ class Day07
 
     private function setPosition($dir, &$path): void
     {
-        switch ($dir) {
-            case '/':
-                $path = ['/'];
-                break;
-            case '..':
-                array_pop($path);
-                break;
-            default:
-                $path[] = $dir;
-        }
+        match ($dir) {
+            '/' => $path = ['/'],
+            '..' => array_pop($path),
+            default => $path[] = $dir,
+        };
     }
 
     function setDiskUsage($i, array $path): void

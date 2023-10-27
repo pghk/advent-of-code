@@ -4,11 +4,15 @@ namespace App\YEAR;
 
 class DayDAY
 {
-    public static function partOne($input)
+    public function __construct(public array $input)
     {
     }
 
-    // public static function partTwo($input)
+    public function partOne()
+    {
+    }
+
+    // public function partTwo()
     // {
     //
     // }

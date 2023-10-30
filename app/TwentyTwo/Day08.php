@@ -31,19 +31,52 @@ class Day08
         $trees = [];
         foreach ($this->y as $y => $row) {
             foreach ($row as $x => $_) {
-//                $yVal = $this->y[$y][$x];
-//                $xVal = $this->x[$x][$y];
-//                print_r("\nx: {$x}, y: {$y} - ");
-//                echo($yVal . "\n");
-//                echo($xVal . "\n");
                 $vis = $this->isVis($x, $y);
                 $trees[] = $vis;
-//                var_dump($vis);
             }
         }
 
         return count(array_filter($trees, fn($i) => $i));
     }
+
+     public function partTwo()
+     {
+         $scores = [];
+         foreach ($this->y as $y => $row) {
+             foreach ($row as $x => $_) {
+                 $scores[] = $this->getViewingDistance($x, $y);
+             }
+         }
+
+//         print_r(json_encode($scores));
+         sort($scores);
+         return array_reverse($scores)[0];
+     }
+
+     private function getViewingDistance($x, $y)
+     {
+         $i = $this->x[$x][$y];
+         $h = $this->y[$y];
+         $v = $this->x[$x];
+         $u = array_slice($v, $y);
+         $r = array_slice($h, $x);
+         $d = array_reverse(array_slice($v, 0, $y - 1));
+         $l = array_reverse(array_slice($h, 0, $x - 1));
+         $views = array_map(function($arr) use ($i) {
+             $view = [];
+             for ($k = 0; $k < count($arr); $k++) {
+                 $j = $arr[$k];
+                 $view[] = $j;
+                 if ($j < $i) {
+                     continue;
+                 }
+                 break;
+             }
+             return count($view);
+         }, [$u, $r, $d, $l]);
+//         print_r("x: {$x}, y: {$y} v: {$i} - " . json_encode($views) . "\n");
+         return array_reduce($views, fn($c, $j) => $c * $j ?? 1, 1);
+     }
 
     private function isVis($x, $y)
     {
@@ -74,10 +107,4 @@ class Day08
         }
         return false;
     }
-
-
-    // public function partTwo()
-    // {
-    //
-    // }
 }

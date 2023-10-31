@@ -7,7 +7,7 @@ class Day09
     const START = ['x' => 0, 'y' => 0];
     private array $tailPositions;
 
-    public function partOne($input)
+    public function partOne($input): int
     {
         $tail = $head = self::START;
         foreach ($input as $move) {
@@ -22,10 +22,24 @@ class Day09
         return count($this->tailPositions);
     }
 
-    // public function partTwo()
-    // {
-    //
-    // }
+    public function partTwo($input): int
+    {
+        $head = self::START;
+        $tails = array_fill(0, 9, self::START);
+        foreach ($input as $move) {
+            [$d, $n] = explode(' ', $move);
+            for ($i = 0; $i < $n; $i++) {
+                $head = $this->move($head, $d);
+                foreach ($tails as $j => $v) {
+                    $lead = $j > 0 ? $tails[$j - 1] : $head;
+                    $tails[$j] = $this->follow($lead, $v);
+                }
+                $key = join(",", array_values($tails[8]));
+                $this->tailPositions[$key] = true;
+            }
+        }
+        return count($this->tailPositions);
+    }
 
     private function move($from, $dir): array
     {
@@ -48,10 +62,10 @@ class Day09
             [+0, -2] => $this->move($tail, 'D'),
             [+2, +0] => $this->move($tail, 'R'),
             [-2, +0] => $this->move($tail, 'L'),
-            [+1, +2], [+2, +1] => $this->move($this->move($tail, 'U'), 'R'),
-            [-1, +2], [-2, +1] => $this->move($this->move($tail, 'U'), 'L'),
-            [+1, -2], [+2, -1] => $this->move($this->move($tail, 'D'), 'R'),
-            [-1, -2], [-2, -1] => $this->move($this->move($tail, 'D'), 'L'),
+            [+1, +2], [+2, +1], [+2, +2] => $this->move($this->move($tail, 'U'), 'R'),
+            [-1, +2], [-2, +1], [-2, +2] => $this->move($this->move($tail, 'U'), 'L'),
+            [+1, -2], [+2, -1], [+2, -2] => $this->move($this->move($tail, 'D'), 'R'),
+            [-1, -2], [-2, -1], [-2, -2] => $this->move($this->move($tail, 'D'), 'L'),
             default => $tail
         };
     }

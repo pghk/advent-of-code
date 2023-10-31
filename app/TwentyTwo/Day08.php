@@ -64,25 +64,26 @@ class Day08
 
     private function isVisible($x, $y): bool
     {
-        $i = $this->x[$x][$y];
+        $thisHeight = $this->x[$x][$y];
         $sightLines = $this->lookOut($x, $y);
+        $anyLineOpen = false;
         foreach ($sightLines as $line) {
             if (count($line) == 0) {
-                return true;
+                $anyLineOpen = true;
+                break;
             }
-        }
-        foreach ($sightLines as $line) {
-            $allOpen = true;
-            foreach ($line as $a) {
-                if ($a >= $i) {
-                    $allOpen = false;
+            $lineOpen = true;
+            foreach ($line as $plot) {
+                if ($plot >= $thisHeight) {
+                    $lineOpen = false;
                 }
             }
-            if ($allOpen) {
-                return true;
+            if ($lineOpen) {
+                $anyLineOpen = true;
+                break;
             }
         }
-        return false;
+        return $anyLineOpen;
     }
 
     private function lookOut($x, $y): array

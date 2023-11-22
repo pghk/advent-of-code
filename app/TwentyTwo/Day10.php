@@ -4,13 +4,11 @@ namespace App\TwentyTwo;
 
 class Day10
 {
-    private array $cycles = [
-        1 => ['X' => 1],
-    ];
+    private array $cycles = [['x' => 1]];
 
     public function __construct(public array $input)
     {
-        $c = 1;
+        $c = 0;
         foreach ($input as $i) {
             $this->cycles[] = $this->cycles[$c];
             $c++;
@@ -18,7 +16,7 @@ class Day10
                 continue;
             }
             $v = (int)explode(' ', $i)[1];
-            $this->cycles[] = ['X' => $this->cycles[$c]['X'] + $v];
+            $this->cycles[] = ['x' => $this->cycles[$c]['x'] + $v];
             $c++;
         }
         array_pop($this->cycles);
@@ -27,13 +25,18 @@ class Day10
     public function partOne()
     {
         return array_sum([
-            $this->cycles[20]['X'] * 20,
-            $this->cycles[60]['X'] * 60,
-            $this->cycles[100]['X'] * 100,
-            $this->cycles[140]['X'] * 140,
-            $this->cycles[180]['X'] * 180,
-            $this->cycles[220]['X'] * 220,
+            $this->getSignal(20),
+            $this->getSignal(60),
+            $this->getSignal(100),
+            $this->getSignal(140),
+            $this->getSignal(180),
+            $this->getSignal(220)
         ]);
+    }
+
+    private function getSignal($n)
+    {
+        return $this->cycles[$n - 1]['x'] * $n;
     }
 
     public function partTwo(): string
@@ -43,33 +46,24 @@ class Day10
 
     private function paint(): string
     {
-        $rows = [];
-        $i = 0;
-        while ($i < count($this->cycles)) {
-            $rows[] = array_combine(
-                range($i + 1, $i + 40),
-                array_slice($this->cycles, $i, 40, true)
-            );
-            $i += 40;
-        }
+        $rows = array_chunk($this->cycles, 40);
         $screen = array_map(fn($r) => static::printRow($r), $rows);
         return join("\n", $screen);
     }
 
     private static function printRow(array $cycles): string
     {
-        $row = [];
+        $row = "";
         foreach ($cycles as $i => $c) {
-            # cycles 1-40 operate on positions 0-39, then wrap around
-            $p = (($i - 1) + 40) % 40;
-            $row[] = static::draw($p, $c['X']);
+            $row .= static::draw($i, $c['x']);
         }
-        return join("", $row);
+        return $row;
     }
 
-    private static function draw($s, $p): string
+    private static function draw($pixel, $pos): string
     {
-        return in_array($s, range($p - 1, $p + 1)) ? "#" : '.';
+        $sprite = range($pos - 1, $pos + 1);
+        return in_array($pixel, $sprite) ? "#" : '.';
     }
 
 }

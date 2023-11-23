@@ -4,7 +4,7 @@ namespace App\TwentyTwo;
 
 class Day11
 {
-    private array $rounds;
+    private object $round;
     private array $monkey_biz_logic;
     private array $monkey_biz_ratings;
 
@@ -29,7 +29,7 @@ class Day11
             ];
             $this->monkey_biz_ratings[$m] = 0;
         }
-        $this->rounds[] = $start;
+        $this->round = $start;
     }
 
     private function parseOp($str): \Closure
@@ -57,7 +57,7 @@ class Day11
     public function partTwo(): int
     {
         $worrySame = fn ($x) => $x;
-        for ($i = 0; $i < 600; $i++) {
+        for ($i = 0; $i < 700; $i++) {
             $this->runRound($worrySame);
         }
         return $this->monkeyBusinessLevel();
@@ -65,7 +65,7 @@ class Day11
 
     private function runRound($reg): void
     {
-        $prev = $this->rounds[count($this->rounds) - 1];
+        $prev = $this->round;
         $next = clone $prev;
 
         foreach ($this->monkey_biz_logic as $m => $b) {
@@ -79,7 +79,7 @@ class Day11
             }
         }
 
-        $this->rounds[] = $next;
+        $this->round = $next;
     }
 
     private function monkeyBusinessLevel(): int

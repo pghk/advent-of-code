@@ -14,7 +14,7 @@ class Day11
         $start = (object)[];
         foreach ($defs as $d) {
             $m = trim(explode(' ', $d[0])[1], ':');
-            $items = array_map(fn($n) => (int)$n, explode(', ', explode(': ', $d[1])[1]));
+            $items = array_map(fn($n) => $n, explode(', ', explode(': ', $d[1])[1]));
             $op = explode('old ', $d[2])[1];
             $test = explode('by ', $d[3])[1];
             $if = explode('y ', $d[4])[1];
@@ -23,7 +23,7 @@ class Day11
             $start->$m = $items;
             $this->monkey_biz_logic[$m] = [
                 'op' => $this->parseOp($op),
-                'test' => fn($x) => $x % $test == 0 ? 'pass' : 'fail',
+                'test' => fn($x) => bcmod($x, $test) == 0 ? 'pass' : 'fail',
                 'pass' => $if,
                 'fail' => $else
             ];
@@ -36,33 +36,34 @@ class Day11
     {
         [$operator, $value] = explode(' ', $str);
         $operation = match ($operator) {
-            '+' => fn($x, $v) => $x + $v,
-            '-' => fn($x, $v) => $x - $v,
-            '*' => fn($x, $v) => $x * $v,
-            '/' => fn($x, $v) => $x / $v,
+            '+' => fn($x, $v) => bcadd($x, $v),
+            '*' => fn($x, $v) => bcmul($x, $v),
         };
         return match ($value) {
             'old' => fn($x) => $operation($x, $x),
-            default => fn($x) => $operation($x, (int)$value)
+            default => fn($x) => $operation($x, $value)
         };
     }
 
-    public function partOne()
+    public function partOne(): int
     {
+        $worryLess = fn ($x) => floor($x / 3);
         foreach (range(1, 20) as $_) {
-            $this->runRound();
+            $this->runRound($worryLess);
         }
-        sort($this->monkey_biz_ratings);
-        [$a, $b] = array_slice($this->monkey_biz_ratings, -2);
-        return $a * $b;
+        return $this->monkeyBusinessLevel();
     }
 
-    // public function partTwo()
-    // {
-    //
-    // }
+    public function partTwo(): int
+    {
+        $worrySame = fn ($x) => $x;
+        for ($i = 0; $i < 600; $i++) {
+            $this->runRound($worrySame);
+        }
+        return $this->monkeyBusinessLevel();
+    }
 
-    public function runRound(): void
+    private function runRound($reg): void
     {
         $prev = $this->rounds[count($this->rounds) - 1];
         $next = clone $prev;
@@ -71,7 +72,7 @@ class Day11
             while (count($next->$m) > 0) {
                 $this->monkey_biz_ratings[$m]++;
                 $i = array_shift($next->$m);
-                $j = floor($b['op']($i) / 3);
+                $j = $reg($b['op']($i));
                 $r = $b['test']($j);
                 $n = $b[$r];
                 $next->$n[] = $j;
@@ -79,5 +80,12 @@ class Day11
         }
 
         $this->rounds[] = $next;
+    }
+
+    private function monkeyBusinessLevel(): int
+    {
+        sort($this->monkey_biz_ratings);
+        [$a, $b] = array_slice($this->monkey_biz_ratings, -2);
+        return $a * $b;
     }
 }

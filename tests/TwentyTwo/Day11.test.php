@@ -44,12 +44,12 @@ test('Part One: Example', function () {
      expect($sys->partOne())->toBe(64032);
  });
 
-// test('Part Two: Example', function () {
-//     $input = explode("\n", EXAMPLE_11);
-//     $sys = new Day11($input);
-//     expect($sys->partTwo())->toBe(0);
-// });
-//
+ test('Part Two: Example', function () {
+     $input = explode("\n", EXAMPLE_11);
+     $sys = new Day11($input);
+     expect($sys->partTwo())->toBe(2713310158);
+ });
+
 // test('Part Two: Puzzle', function () {
 //     $input = file(at('TwentyTwo/11.txt'), FILE_IGNORE_NEW_LINES);
 //     $sys = new Day11($input);

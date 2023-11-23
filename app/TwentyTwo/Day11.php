@@ -5,6 +5,7 @@ namespace App\TwentyTwo;
 class Day11
 {
     private object $round;
+    private int $max_worry = 1;
     private array $monkey_biz_logic;
     private array $monkey_biz_ratings;
 
@@ -16,19 +17,21 @@ class Day11
             $m = trim(explode(' ', $d[0])[1], ':');
             $items = array_map(fn($n) => $n, explode(', ', explode(': ', $d[1])[1]));
             $op = explode('old ', $d[2])[1];
-            $test = explode('by ', $d[3])[1];
+            $div = explode('by ', $d[3])[1];
             $if = explode('y ', $d[4])[1];
             $else = explode('y ', $d[5])[1];
 
             $start->$m = $items;
+            $this->max_worry *= $div;
             $this->monkey_biz_logic[$m] = [
                 'op' => $this->parseOp($op),
-                'test' => fn($x) => bcmod($x, $test) == 0 ? 'pass' : 'fail',
+                'test' => fn($x) => bcmod($x, $div) == 0 ? 'pass' : 'fail',
                 'pass' => $if,
                 'fail' => $else
             ];
             $this->monkey_biz_ratings[$m] = 0;
         }
+
         $this->round = $start;
     }
 
@@ -47,7 +50,7 @@ class Day11
 
     public function partOne(): int
     {
-        $worryLess = fn ($x) => floor($x / 3);
+        $worryLess = fn($x) => floor($x / 3);
         foreach (range(1, 20) as $_) {
             $this->runRound($worryLess);
         }
@@ -56,9 +59,9 @@ class Day11
 
     public function partTwo(): int
     {
-        $worrySame = fn ($x) => $x;
-        for ($i = 0; $i < 700; $i++) {
-            $this->runRound($worrySame);
+        $worryLess = fn($x) => $x % $this->max_worry;
+        for ($i = 0; $i < 10000; $i++) {
+            $this->runRound($worryLess);
         }
         return $this->monkeyBusinessLevel();
     }

@@ -4,48 +4,35 @@ namespace App\TwentyTwo;
 
 class Day11
 {
-    private object $round;
+    private object $state;
     private int $max_worry = 1;
     private array $monkey_biz_logic;
     private array $monkey_biz_ratings;
 
     public function __construct(public array $input)
     {
-        $defs = array_chunk($input, 7);
         $start = (object)[];
-        foreach ($defs as $d) {
-            $m = trim(explode(' ', $d[0])[1], ':');
-            $items = array_map(fn($n) => $n, explode(', ', explode(': ', $d[1])[1]));
-            $op = explode('old ', $d[2])[1];
-            $div = explode('by ', $d[3])[1];
-            $if = explode('y ', $d[4])[1];
-            $else = explode('y ', $d[5])[1];
+        $monkeys = array_chunk($input, 7);
+        foreach ($monkeys as $i => $lines) {
+            $start->$i = explode(', ', explode(': ', $lines[1])[1]);
 
-            $start->$m = $items;
-            $this->max_worry *= $div;
-            $this->monkey_biz_logic[$m] = [
-                'op' => $this->parseOp($op),
-                'test' => fn($x) => bcmod($x, $div) == 0 ? 'pass' : 'fail',
+            $op = explode('d ', $lines[2])[1];
+            $div = explode('y ', $lines[3])[1];
+            $if = explode('y ', $lines[4])[1];
+            $else = explode('y ', $lines[5])[1];
+
+            $this->monkey_biz_logic[$i] = [
+                'do' => static::getOperation($op),
+                'test' => fn($x) => $x % $div == 0 ? 'pass' : 'fail',
                 'pass' => $if,
                 'fail' => $else
             ];
-            $this->monkey_biz_ratings[$m] = 0;
+
+            $this->max_worry *= $div;
+            $this->monkey_biz_ratings[$i] = 0;
         }
 
-        $this->round = $start;
-    }
-
-    private function parseOp($str): \Closure
-    {
-        [$operator, $value] = explode(' ', $str);
-        $operation = match ($operator) {
-            '+' => fn($x, $v) => bcadd($x, $v),
-            '*' => fn($x, $v) => bcmul($x, $v),
-        };
-        return match ($value) {
-            'old' => fn($x) => $operation($x, $x),
-            default => fn($x) => $operation($x, $value)
-        };
+        $this->state = $start;
     }
 
     public function partOne(): int
@@ -66,23 +53,36 @@ class Day11
         return $this->monkeyBusinessLevel();
     }
 
-    private function runRound($reg): void
-    {
-        $prev = $this->round;
-        $next = clone $prev;
 
-        foreach ($this->monkey_biz_logic as $m => $b) {
-            while (count($next->$m) > 0) {
-                $this->monkey_biz_ratings[$m]++;
-                $i = array_shift($next->$m);
-                $j = $reg($b['op']($i));
-                $r = $b['test']($j);
-                $n = $b[$r];
-                $next->$n[] = $j;
+    private static function getOperation($str): \Closure
+    {
+        [$op, $val] = explode(' ', $str);
+        $operate = match ($op) {
+            '+' => fn($x, $v) => $x + $v,
+            '*' => fn($x, $v) => $x * $v,
+        };
+        return match ($val) {
+            'old' => fn($x) => $operate($x, $x),
+            default => fn($x) => $operate($x, $val)
+        };
+    }
+
+
+    private function runRound($regulate): void
+    {
+        foreach ($this->monkey_biz_logic as $id => $monkey) {
+            while (count($this->state->$id) > 0) {
+                $this->monkey_biz_ratings[$id]++;
+
+                $worry = array_shift($this->state->$id);
+                $next_worry = $regulate($monkey['do']($worry));
+
+                $pass_to = $monkey['test']($next_worry);
+                $next_id = $monkey[$pass_to];
+
+                $this->state->$next_id[] = $next_worry;
             }
         }
-
-        $this->round = $next;
     }
 
     private function monkeyBusinessLevel(): int

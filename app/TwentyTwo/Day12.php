@@ -29,7 +29,7 @@ class Day12
 
     private function search()
     {
-        $found = false;
+        $found = null;
         while ($found == null && count($this->to_search)) {
             $i = array_shift($this->to_search);
             if (array_key_exists($i['key'], $this->search_history)) {

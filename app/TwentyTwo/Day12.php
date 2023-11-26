@@ -7,76 +7,59 @@ class Day12
     private array $grid;
     private array $to_search = [];
     private array $search_history = [];
-    private int $search_depth = 0;
-    private array $start;
-    private int $limit = 0;
+    private array $end_values;
 
     public function __construct(public array $input)
     {
         $this->grid = $input;
-        foreach ($input as $r => $row) {
-            foreach (str_split($row) as $c => $v) {
-                if ($v == 'S') {
-                    $this->to_search[] = [
-                        'key' => "{$c}-{$r}",
-                        'value' => $this->getCell($c, $r),
-                        'dist' => 0,
-                    ];
-                    break 2;
-                }
-            }
-        }
-//        print(json_encode($this->start));
+        $this->setStart('E');
     }
 
     public function partOne()
     {
+        $this->end_values = ['S'];
         return $this->search();
     }
 
-    // public function partTwo()
-    // {
-    //
-    // }
+     public function partTwo()
+     {
+         $this->end_values = ['a', 'S'];
+         return $this->search();
+     }
 
     private function search()
     {
-        $is_found = false;
-//        print("starting here: " . json_encode($this->to_search) . "\n");
-        while ($is_found == false && count($this->to_search) > 0 && $this->limit <= 10) {
+        $found = false;
+        while ($found == null && count($this->to_search)) {
             $i = array_shift($this->to_search);
             if (array_key_exists($i['key'], $this->search_history)) {
                 continue;
             }
-            $this->search_history[$i['key']] = true;
-//            print("searching: " . json_encode($i) . "\n");
-            $is_found = $this->reviewPaths($i);
-//            $this->limit++;
+            $this->search_history[$i['key']] = $i['dist'];
+            $found = $this->reviewPaths($i);
         }
-        return array_reverse($this->to_search)[0]['dist'];
+        return $found;
     }
 
     private function reviewPaths($start)
     {
         $depth = $start['dist'];
-//        print("parent: " . json_encode($start) . "\n");
         $next = $this->chartPaths($start['key']);
-        $is_found = false;
+        $found = null;
         foreach ($next as $path) {
-            if ($path['value'] == 'E') {
-                $is_found = true;
+            $path['dist'] = $depth + 1;
+            if (in_array($path['value'], $this->end_values)) {
+                $found = $path['dist'];
                 break;
             }
-            $path['dist'] = $depth + 1;
             $this->to_search[] = $path;
         }
-        return $is_found;
+        return $found;
     }
 
-    private function chartPaths($key)
+    private function chartPaths($key): array
     {
         [$x, $y] = array_map(fn($i) => intval($i), explode('-', $key));
-//        var_dump(explode('-', $key));
         $valid = [];
         $elevation = array_merge(
             ['S' => 1, 'E' => 26],
@@ -85,14 +68,14 @@ class Day12
         $a = $this->getCell($x, $y);
         foreach ($this->getNeighbors($x, $y) as $n => $i) {
             $b = $i['value'];
-            if ($elevation[$b] - $elevation[$a] <= 1) {
+            if ($elevation[$a] - $elevation[$b] <= 1) {
                 $valid[] = $i;
             }
         }
         return $valid;
     }
 
-    private function getNeighbors($x, $y)
+    private function getNeighbors($x, $y): array
     {
         $directions = [
             'n' => [0, -1],
@@ -121,6 +104,22 @@ class Day12
     private function getCell($x, $y)
     {
         return $this->grid[$y][$x];
+    }
+
+    public function setStart($label): void
+    {
+        foreach ($this->grid as $r => $row) {
+            foreach (str_split($row) as $c => $v) {
+                if ($v == $label) {
+                    $this->to_search[] = [
+                        'key' => "{$c}-{$r}",
+                        'value' => $this->getCell($c, $r),
+                        'dist' => 0,
+                    ];
+                    break 2;
+                }
+            }
+        }
     }
 
 }

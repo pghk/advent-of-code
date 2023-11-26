@@ -22,14 +22,14 @@ test('Part One: Example', function () {
      expect($sys->partOne())->toBe(456);
  });
 
-// test('Part Two: Example', function () {
-//     $input = explode("\n", EXAMPLE_12);
-//     $sys = new Day12($input);
-//     expect($sys->partTwo())->toBe(0);
-// });
-//
-// test('Part Two: Puzzle', function () {
-//     $input = file(at('TwentyTwo/12.txt'), FILE_IGNORE_NEW_LINES);
-//     $sys = new Day12($input);
-//     expect($sys->partTwo())->toBe(0);
-// });
+ test('Part Two: Example', function () {
+     $input = explode("\n", EXAMPLE_12);
+     $sys = new Day12($input);
+     expect($sys->partTwo())->toBe(29);
+ });
+
+ test('Part Two: Puzzle', function () {
+     $input = file(at('TwentyTwo/12.txt'), FILE_IGNORE_NEW_LINES);
+     $sys = new Day12($input);
+     expect($sys->partTwo())->toBe(454);
+ });

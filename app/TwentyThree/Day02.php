@@ -42,10 +42,28 @@ class Day02
         return array_sum($possibleGames);
     }
 
-    // public function partTwo()
-    // {
-    //
-    // }
+     public function partTwo()
+     {
+         $powers = [];
+
+         foreach ($this->games as $g) {
+            $minis = [
+                'red' => 0,
+                'green' => 0,
+                'blue' => 0,
+            ];
+            foreach ($g->sets as $set) {
+                foreach ($minis as $color => $count) {
+                    if ($set->$color > $count) {
+                        $minis[$color] = $set->$color;
+                    }
+                }
+            }
+            $powers[] = $minis['red'] * $minis['green'] * $minis['blue'];
+         }
+
+         return array_sum($powers);
+     }
 
     private function parse(array $defs)
     {

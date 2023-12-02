@@ -9,6 +9,16 @@ const EXAMPLE_01 = <<<txt
     treb7uchet
     txt;
 
+const EXAMPLE_01_b = <<<txt
+    two1nine
+    eightwothree
+    abcone2threexyz
+    xtwone3four
+    4nineeightseven2
+    zoneight234
+    7pqrstsixteen
+    txt;
+
 test('Part One: Example', function () {
     $input = explode("\n", EXAMPLE_01);
     $sys = new Day01($input);
@@ -21,14 +31,14 @@ test('Part One: Example', function () {
      expect($sys->partOne())->toBe(54644);
  });
 
-// test('Part Two: Example', function () {
-//     $input = explode("\n", EXAMPLE_01);
-//     $sys = new Day01($input);
-//     expect($sys->partTwo())->toBe(0);
-// });
-//
-// test('Part Two: Puzzle', function () {
-//     $input = file(at('TwentyThree/01.txt'), FILE_IGNORE_NEW_LINES);
-//     $sys = new Day01($input);
-//     expect($sys->partTwo())->toBe(0);
-// });
+ test('Part Two: Example', function () {
+     $input = explode("\n", EXAMPLE_01_b);
+     $sys = new Day01($input);
+     expect($sys->partTwo())->toBe(281);
+ });
+
+ test('Part Two: Puzzle', function () {
+     $input = file(at('TwentyThree/01.txt'), FILE_IGNORE_NEW_LINES);
+     $sys = new Day01($input);
+     expect($sys->partTwo())->toBe(53348);
+ });

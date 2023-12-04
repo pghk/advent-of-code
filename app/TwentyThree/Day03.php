@@ -5,7 +5,6 @@ namespace App\TwentyThree;
 class Day03
 {
     public array $partNums;
-    public array $gearRatios;
 
     private array $grid;
     private array $gears = [];
@@ -40,11 +39,11 @@ class Day03
             }
         }
 
-        $this->partNums = array_filter($nums, function($v, $k) {
+        $this->partNums = array_filter($nums, function ($v, $k) {
             [$x, $y] = explode('-', $k);
             $span = range($x, intval($x) + strlen($v) - 1);
             $isValid = false;
-            foreach($span as $x) {
+            foreach ($span as $x) {
                 [$s, $sx, $sy] = $this->getAdjacentSymbol($x, $y);
                 if ($s == "*") {
                     $this->gears["{$sx}-{$sy}"][] = $v;
@@ -57,26 +56,25 @@ class Day03
             return $isValid;
         }, ARRAY_FILTER_USE_BOTH);
 
-        $this->gears = array_filter($this->gears, function($v) {
-           return count($v) == 2;
+        $this->gears = array_filter($this->gears, function ($v) {
+            return count($v) == 2;
         });
     }
 
     public function partOne()
     {
-
         return array_sum($this->partNums);
     }
 
-     public function partTwo()
-     {
-         $ratios = [];
-         foreach ($this->gears as $g) {
-             [$a, $b] = $g;
-             $ratios[] = $a * $b;
-         }
-         return array_sum($ratios);
-     }
+    public function partTwo()
+    {
+        $ratios = [];
+        foreach ($this->gears as $g) {
+            [$a, $b] = $g;
+            $ratios[] = $a * $b;
+        }
+        return array_sum($ratios);
+    }
 
     private function getAdjacentSymbol($x, $y)
     {
@@ -84,7 +82,7 @@ class Day03
         foreach ($dirs as $dir) {
             [$c, $nx, $ny] = $this->checkNeighbor($x, $y, $dir);
             if ($this->isSymbol($c)) {
-               return [$c, $nx, $ny];
+                return [$c, $nx, $ny];
             }
         }
 
@@ -98,7 +96,7 @@ class Day03
 
     private function checkNeighbor($x, $y, $dir)
     {
-        [$nx, $ny] = match($dir) {
+        [$nx, $ny] = match ($dir) {
             'U' => [$x, $y + 1],
             'R' => [$x + 1, $y],
             'D' => [$x, $y - 1],

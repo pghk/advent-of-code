@@ -16,9 +16,10 @@ class Day05
 
     public function partOne()
     {
-        $locations = array_map(fn ($s) => $this->follow($s), $this->seeds);
+        $locations = array_map(fn($s) => $this->follow($s), $this->seeds);
         sort($locations);
         return $locations[0];
+//        return $this->maps[0]->resolve(101);
     }
 
     // public function partTwo()
@@ -40,16 +41,23 @@ class Day05
 
     public function follow($seed): mixed
     {
-        $s = $this->maps[0]->get($seed);
-        $f = $this->maps[1]->get($s);
-        $w = $this->maps[2]->get($f);
-        $l = $this->maps[3]->get($w);
-        $t = $this->maps[4]->get($l);
-        $h = $this->maps[5]->get($t);
-        $l = $this->maps[6]->get($h);
-
-        return $l;
+        $soil = $this->maps[0]->resolve($seed);
+        print("soil: " . $soil . "\n");
+        $fertile = $this->maps[1]->resolve($soil);
+        print("fertile: " . $fertile . "\n");
+        $water = $this->maps[2]->resolve($fertile);
+        print("water: " . $water. "\n");
+        $light = $this->maps[3]->resolve($water);
+        print("light: " . $light . "\n");
+        $temp = $this->maps[4]->resolve($light);
+        print("temp: " . $temp . "\n");
+        $humid = $this->maps[5]->resolve($temp);
+        print("humid: " . $humid . "\n");
+        $loc = $this->maps[6]->resolve($humid);
+        print("loc: " . $loc . "\n");
+        return $loc;
     }
+
 
 }
 
@@ -59,6 +67,13 @@ class Map
     private array $columns;
     private array $map;
 
+    /**
+     * @var MiniMap[]
+     */
+    private array $subMaps = [];
+    private int $subMapCount = 0;
+    private $limit = 0;
+
     public function __construct(string $def)
     {
         $data = explode("\n", $def);
@@ -66,30 +81,87 @@ class Map
         $this->columns = explode('-to-', $type);
         $this->type = join('-', $this->columns);
 
-        $nums = array_map(function ($x) {
-            [$a, $b, $n] = explode(' ', $x);
-            return [
-                $this->columns[0] => range($a, intval($a) + intval($n) - 1),
-                $this->columns[1] => range($b, intval($b) + intval($n) - 1),
-            ];
-        }, $data);
-
-        $parts = array_map(function ($p) {
-            return array_combine(
-                $p[$this->columns[1]],
-                $p[$this->columns[0]],
-            );
-        }, $nums);
-
-        $data = [];
-        foreach($parts as $p) {
-            $data = $data + $p;
+        foreach ($data as $line) {
+            [$a, $b, $n] = array_map(fn($s) => intval($s), explode(' ', $line));
+            $this->subMaps[] = new MiniMap($a, $b, $n);
+            $this->subMapCount++;
         }
-        $this->map = $data;
+        usort($this->subMaps, function ($a, $b) {
+            if ($a->min == $b->min) {
+                return 0;
+            };
+            return $a->min < $b->min ? -1 : 1;
+        });
     }
 
-    public function get($s)
+    public function resolve($x)
     {
-       return $this->map[$s] ?? $s;
+       return $this->findMiniMap($x, range(0, $this->subMapCount - 1));
+    }
+
+    private function findMiniMap(int $x, array $options)
+    {
+//        if ($this->limit > 50) {
+//            return null;
+//        }
+        print(json_encode([$x, $options]) . "\n");
+        $this->limit++;
+        if (empty($options)) {
+            return $x;
+        }
+        if (count($options) == 1) {
+            $miniMap = $this->subMaps[end($options)];
+            print("last option: {$options[0]} \n");
+            if ($miniMap->compare($x) == 0) {
+               return $miniMap->resolve($x);
+            }
+            return $x;
+        }
+        $mid = ceil(count($options) / 2);
+        $miniMap = $this->subMaps[$mid];
+        print("checking option {$mid} \n");
+        $next = match ($miniMap->compare($x)) {
+            -1 => array_slice($options, 0, $mid),
+            1 => array_slice($options, $mid),
+            0 => [$mid]
+        };
+        return $this->findMiniMap($x, $next);
+    }
+
+}
+
+class MiniMap
+{
+    public int $min;
+    public int $max;
+
+    public function __construct(
+        public int $dest,
+        public int $source,
+        public int $length
+    )
+    {
+        $this->min = $this->source;
+        $this->max = $this->source + $this->length - 1;
+    }
+
+    public function compare($n): int
+    {
+        if ($n < $this->source) {
+            print("less" . "\n");
+            return -1;
+        }
+        if ($n > $this->max) {
+            print("more" . "\n");
+            return 1;
+        }
+        print("same" . "\n");
+        return 0;
+    }
+
+    public function resolve($x): int
+    {
+        print(json_encode([$x, $this->source, $this->dest]) . "\n");
+        return ($x - $this->source) + $this->dest;
     }
 }

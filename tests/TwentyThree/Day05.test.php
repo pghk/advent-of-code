@@ -45,9 +45,9 @@ test('Part One: Example', function () {
 });
 
 test('Part One: Puzzle', function () {
-    $input = file(at('TwentyThree/05.txt'), FILE_IGNORE_NEW_LINES);
+    $input = explode("\n\n", file_get_contents(at('TwentyThree/05.txt')));
     $sys = new Day05($input);
-    expect($sys->partOne())->toBe(0);
+    expect($sys->partOne())->toBe(282277027);
 });
 
 // test('Part Two: Example', function () {

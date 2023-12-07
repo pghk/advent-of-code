@@ -19,13 +19,18 @@ class Day05
         $locations = array_map(fn($s) => $this->follow($s), $this->seeds);
         sort($locations);
         return $locations[0];
-//        return $this->maps[0]->resolve(101);
     }
 
-    // public function partTwo()
-    // {
-    //
-    // }
+    public function partTwo()
+    {
+        $locations = [];
+        while (count($this->seeds)) {
+            [$start, $length] = array_splice($this->seeds, 0, 2);
+            $locations = array_merge($locations, $this->followRange(intval($start), intval($length)));
+        }
+        sort($locations);
+        return $locations[0];
+    }
 
     private static function parseSeeds(string $line): array
     {
@@ -42,20 +47,30 @@ class Day05
     public function follow($seed): mixed
     {
         $soil = $this->maps[0]->resolve($seed);
-        print("soil: " . $soil . "\n");
         $fertile = $this->maps[1]->resolve($soil);
-        print("fertile: " . $fertile . "\n");
         $water = $this->maps[2]->resolve($fertile);
-        print("water: " . $water. "\n");
         $light = $this->maps[3]->resolve($water);
-        print("light: " . $light . "\n");
         $temp = $this->maps[4]->resolve($light);
-        print("temp: " . $temp . "\n");
         $humid = $this->maps[5]->resolve($temp);
-        print("humid: " . $humid . "\n");
         $loc = $this->maps[6]->resolve($humid);
-        print("loc: " . $loc . "\n");
         return $loc;
+    }
+
+    public function followRange($start, $length): mixed
+    {
+        $ranges = [[$start, $start + $length - 1]];
+        foreach ($this->maps as $m) {
+            $next = [];
+            foreach ($ranges as $r) {
+                [$low, $high] = $r;
+                $resolved = $m->resolveRange($low, $high);
+                foreach ($resolved as $res) {
+                    $next[] = $res;
+                }
+            }
+            $ranges = $next;
+        }
+        return array_filter(array_column($ranges, 0));
     }
 
 
@@ -64,8 +79,8 @@ class Day05
 class Map
 {
     public string $type;
+    public array $rangeList;
     private array $columns;
-    private array $map;
 
     /**
      * @var MiniMap[]
@@ -92,11 +107,30 @@ class Map
             };
             return $a->min < $b->min ? -1 : 1;
         });
+        $this->rangeList = array_map(fn($sm) => ["input" => $sm->inputRange, "output" => $sm->outputRange],
+            $this->subMaps);
     }
 
     public function resolve($x)
     {
-       return $this->findMiniMap($x, range(0, $this->subMapCount - 1));
+        return $this->findMiniMap($x, range(0, $this->subMapCount - 1));
+    }
+
+    public function resolveRange($low, $high)
+    {
+        $next_map = [];
+        foreach ($this->subMaps as $i => $m) {
+            $resolved = $m->resolveRange($low, $high);
+            foreach ($resolved as $k => $v) {
+                if ($k === 'within' || $this->type == "humidity-location") {
+                    $next_map[] = $v;
+                }
+            }
+            if ($i === $this->subMapCount - 1 && empty($next_map)) {
+                $next_map = array_values($resolved);
+            }
+        }
+        return $next_map;
     }
 
     private function findMiniMap(int $x, array $options)
@@ -113,7 +147,7 @@ class Map
             $miniMap = $this->subMaps[end($options)];
             print("last option: {$options[0]} \n");
             if ($miniMap->compare($x) == 0) {
-               return $miniMap->resolve($x);
+                return $miniMap->resolve($x);
             }
             return $x;
         }
@@ -134,15 +168,18 @@ class MiniMap
 {
     public int $min;
     public int $max;
+    public array $inputRange;
+    public array $outputRange;
 
     public function __construct(
         public int $dest,
         public int $source,
         public int $length
-    )
-    {
+    ) {
         $this->min = $this->source;
         $this->max = $this->source + $this->length - 1;
+        $this->inputRange = [$this->source, $this->source + $this->length - 1];
+        $this->outputRange = [$this->dest, $this->dest + $this->length - 1];
     }
 
     public function compare($n): int
@@ -163,5 +200,45 @@ class MiniMap
     {
         print(json_encode([$x, $this->source, $this->dest]) . "\n");
         return ($x - $this->source) + $this->dest;
+    }
+
+    public function resolveRange($low, $high)
+    {
+        $min = $this->min;
+        $max = $this->max;
+
+        $under = null;
+        $within = null;
+        $over = null;
+
+        if ($high < $min || $low > $max) {
+            return ['outside' => [$low, $high]];
+        }
+
+        if ($low < $min) {
+            $under = [$low, $min - 1];
+        }
+        if ($high > $max) {
+            $over = [$max + 1, $high];
+        }
+
+        if ($low < $min && $high <= $max) {
+            $within = [$min, $high];
+        }
+        if ($low < $min && $high > $max) {
+            $within = [$min, $max];
+        }
+        if ($low >= $min && $high <= $max) {
+            $within = [$low, $high];
+        }
+        if ($low >= $min && $high > $max) {
+            $within = [$low, $max];
+        }
+        if ($within) {
+            $within = array_map(fn($x) => $x - $this->source + $this->dest, $within);
+        }
+
+
+        return array_filter(['under' => $under, 'within' => $within, 'over' => $over]);
     }
 }

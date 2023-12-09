@@ -11,7 +11,7 @@ class Day09
     {
         foreach ($input as $line) {
             $this->history[] = array_map(
-                fn($l) => intval($l),
+                fn($v) => intval($v),
                 explode(' ', $line)
             );
         }
@@ -42,10 +42,20 @@ class Day09
         return array_sum($next);
     }
 
-    // public function partTwo()
-    // {
-    //
-    // }
+    public function partTwo(): int
+    {
+        $prev = [];
+
+        foreach ($this->history as $k => $v) {
+            $offset = 0;
+            foreach (array_reverse($this->patterns[$k]) as $p) {
+                $offset = $p[0] - $offset;
+            }
+            $prev[] = $v[0] - $offset;
+        }
+
+        return array_sum($prev);
+    }
 
     private function hasPattern($items): bool
     {

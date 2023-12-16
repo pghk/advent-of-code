@@ -52,10 +52,22 @@ class Day10
         return $dist;
     }
 
-    // public function partTwo()
-    // {
-    //
-    // }
+    public function partTwo()
+    {
+        $count = 0;
+        $this->partOne();
+        foreach ($this->grid as $x => $col) {
+            foreach ($col as $y => $cell) {
+                if (!$cell instanceof Pipe || !isset($cell->dist)) {
+                    if ($this->isEnclosed($x, $y)) {
+                        $count++;
+                    }
+                }
+            }
+        }
+//        $this->drawMap();
+        return $count;
+    }
 
     public function getNeighbors($x, $y)
     {
@@ -108,6 +120,86 @@ class Day10
             print implode("", $row) . "\n";
         }
     }
+
+    public function drawMap(): void
+    {
+        $out = [];
+        foreach ($this->grid as $x => $col) {
+            foreach ($col as $y => $cell) {
+                $out[$y][$x] = $cell ? $cell->glyph() : "·";
+            }
+        }
+        print("\n");
+        foreach ($out as $row) {
+            print implode("", $row) . "\n";
+        }
+    }
+
+    private function isEnclosed($x, $y): bool
+    {
+        $count = $this->countIntersects($x, $y) % 2 != 0;
+        return $count % 2 != 0;
+    }
+
+    private function countIntersects($x, $y)
+    {
+        return min(
+            $this->countLongIntersects($x, $y),
+            $this->countLatIntersects($x, $y)
+        );
+    }
+
+    private function countLatIntersects($x, $y): int
+    {
+        $max = count($this->grid[0]) - 1;
+
+        $counts = ['north' => 0, 'south' => 0];
+        foreach (['north' => -1, 'south' => 1] as $k => $v) {
+            $pos = $y;
+            $east_halves = 0;
+            $west_halves = 0;
+            while ($pos >= 0 && $pos <= $max) {
+                $cell = $this->grid[$x][$pos];
+                if ($cell instanceof Pipe && isset($cell->dist)) {
+                    if ($cell->e) {
+                        $east_halves++;
+                    }
+                    if ($cell->w) {
+                        $west_halves++;
+                    }
+                }
+                $pos = $pos + $v;
+            }
+            $counts[$k] = min($east_halves, $west_halves);
+        }
+        return (min($counts['north'], $counts['south']));
+    }
+
+    private function countLongIntersects($x, $y): int
+    {
+        $max = count($this->grid) - 1;
+
+        $counts = ['west' => 0, 'east' => 0];
+        foreach (['west' => -1, 'east' => 1] as $k => $v) {
+            $pos = $x;
+            $north_halves = 0;
+            $south_halves = 0;
+            while ($pos >= 0 && $pos <= $max) {
+                $cell = $this->grid[$pos][$y];
+                if ($cell instanceof Pipe && isset($cell->dist)) {
+                    if ($cell->n) {
+                        $north_halves++;
+                    }
+                    if ($cell->s) {
+                        $south_halves++;
+                    }
+                }
+                $pos = $pos + $v;
+            }
+            $counts[$k] = min($north_halves, $south_halves);
+        }
+        return (min($counts['west'], $counts['east']));
+    }
 }
 
 class Pipe
@@ -116,6 +208,7 @@ class Pipe
     public bool $s = false;
     public bool $e = false;
     public bool $w = false;
+    public array $glyphs = ['·'];
 
     public int $dist;
 
@@ -125,26 +218,32 @@ class Pipe
             case '|':
                 $this->n = true;
                 $this->s = true;
+                $this->glyphs = ['║', '│'];
                 break;
             case '-':
                 $this->e = true;
                 $this->w = true;
+                $this->glyphs = ['═', '─'];
                 break;
             case 'L':
                 $this->n = true;
                 $this->e = true;
+                $this->glyphs = ['╚', '└'];
                 break;
             case '7':
                 $this->w = true;
                 $this->s = true;
+                $this->glyphs = ['╗', '┐'];
                 break;
             case 'J':
                 $this->n = true;
                 $this->w = true;
+                $this->glyphs = ['╝', '┘'];
                 break;
             case 'F':
                 $this->e = true;
                 $this->s = true;
+                $this->glyphs = ['╔', '┌'];
                 break;
         }
     }
@@ -162,6 +261,11 @@ class Pipe
             'w' => $this->e,
             'e' => $this->w,
         };
+    }
+
+    public function glyph()
+    {
+        return isset($this->dist) ? $this->glyphs[0] : $this->glyphs[1];
     }
 
 }
